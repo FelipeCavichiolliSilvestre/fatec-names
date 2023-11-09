@@ -2,39 +2,20 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:names/entities/city.dart';
 import 'package:names/entities/name.dart';
-import 'package:names/screens/states_screen.dart';
+import "package:names/extensions.dart";
 
-void main() {
-  runApp(const MyApp());
-}
+class NamesScreen extends StatefulWidget {
+  final City city;
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Names',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const StatesScreen(),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
-  final String title;
+  const NamesScreen({super.key, required this.city});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<NamesScreen> createState() => _NamesScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _NamesScreenState extends State<NamesScreen> {
   Future<List<Name>> _names = Future(() => []);
 
   @override
@@ -44,16 +25,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Name>> _fetchNames() async {
-    var url = Uri.https('servicodados.ibge.gov.br',
-        'api/v2/censos/nomes/ranking', {"localidade": "3534708"});
+    var url = Uri.https(
+        'servicodados.ibge.gov.br',
+        'api/v2/censos/nomes/ranking',
+        {"localidade": widget.city.id.toString()});
 
     var response = await http.get(url);
     var data = jsonDecode(utf8.decode(response.bodyBytes))[0]["res"] as List;
 
     var nameList = data
         .map((e) => Name(
-            name: e["nome"], frequency: e["frequencia"], ranking: e["ranking"]))
+            name: (e["nome"] as String).capitalize(),
+            frequency: e["frequencia"],
+            ranking: e["ranking"]))
         .toList();
+
+    nameList.sort((a, b) => a.ranking - b.ranking);
 
     return nameList;
   }
@@ -63,7 +50,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(widget.city.name),
       ),
       body: FutureBuilder(
           future: _names,
