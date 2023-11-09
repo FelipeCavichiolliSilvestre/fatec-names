@@ -1,7 +1,7 @@
-class CountryState {
-  final int id;
-  final String acronym;
-  final String name;
+import 'package:names/entities/locality.dart';
 
-  CountryState({required this.id, required this.acronym, required this.name});
+class CountryState extends Locality {
+  final String acronym;
+
+  CountryState({required this.acronym, required super.id, required super.name});
 }

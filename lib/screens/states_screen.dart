@@ -28,10 +28,14 @@ class _StatesScreenState extends State<StatesScreen> {
     var response = await http.get(url);
     var data = jsonDecode(utf8.decode(response.bodyBytes)) as List;
 
-    return data
+    var stateList = data
         .map((s) =>
             CountryState(id: s["id"], acronym: s["sigla"], name: s["nome"]))
         .toList();
+
+    stateList.sort((a, b) => a.name.compareTo(b.name));
+
+    return stateList;
   }
 
   @override

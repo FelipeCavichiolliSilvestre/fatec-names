@@ -1,6 +1,5 @@
-class City {
-  final int id;
-  final String name;
+import 'package:names/entities/locality.dart';
 
-  City({required this.id, required this.name});
+class City extends Locality {
+  City({required super.id, required super.name});
 }

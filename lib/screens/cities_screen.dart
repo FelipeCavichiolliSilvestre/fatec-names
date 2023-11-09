@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:names/entities/city.dart';
+import 'package:names/entities/locality.dart';
 import 'package:names/entities/state.dart';
 import 'package:names/screens/names_screen.dart';
 
@@ -31,7 +32,7 @@ class _CitiesScreenState extends State<CitiesScreen> {
     var response = await http.get(url);
     var data = jsonDecode(utf8.decode(response.bodyBytes)) as List;
 
-    return data.map((s) => City(id: s["id"], name: s["nome"])).toList();
+    return data.map((c) => City(id: c["id"], name: c["nome"])).toList();
   }
 
   @override
@@ -45,7 +46,7 @@ class _CitiesScreenState extends State<CitiesScreen> {
           future: _cities,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return _stateList(context, snapshot.data!);
+              return _cityList(context, snapshot.data!);
             }
 
             if (snapshot.hasError) {
@@ -57,21 +58,23 @@ class _CitiesScreenState extends State<CitiesScreen> {
     );
   }
 
-  Widget _stateList(BuildContext context, List<City> states) {
+  Widget _cityList(BuildContext context, List<City> cities) {
+    final cityList = cities.map((e) => _listItem(e)).toList();
+    cityList.insert(0, _listItem(widget.state));
+
     return ListView(
-        children: ListTile.divideTiles(
-                tiles: states.map((e) => _stateListItem(e)), context: context)
-            .toList());
+        children:
+            ListTile.divideTiles(tiles: cityList, context: context).toList());
   }
 
-  Widget _stateListItem(City city) {
+  Widget _listItem(Locality locality) {
     return ListTile(
-        title: Text(city.name),
+        title: Text(locality.name),
         trailing: const Icon(Icons.arrow_forward),
         onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NamesScreen(city: city),
+              builder: (context) => NamesScreen(locality: locality),
             )));
   }
 }

@@ -1,7 +1,7 @@
 class Name {
-  final String name;
+  final String value;
   final int frequency;
   final int ranking;
 
-  Name({required this.name, required this.frequency, required this.ranking});
+  Name({required this.value, required this.frequency, required this.ranking});
 }
